@@ -49,6 +49,7 @@ const AuthPage = () => {
   const [phone, setPhone] = useState("");
   const [isNewUser, setIsNewUser] = useState(false);
   const [canResend, setCanResend] = useState(false);
+  const [realOtpCode, setRealOtpCode] = useState<string>("");
   const form = useForm<AuthFormValues>({
     resolver: zodResolver(step === "code" ? codeSchema : phoneSchema),
     defaultValues: { phone: "", code: "" },
@@ -81,7 +82,7 @@ const AuthPage = () => {
     if (fullNameParam) updateUserForm.setValue("fullName", fullNameParam);
     if (birthdayParam) updateUserForm.setValue("birthday", birthdayParam);
     if (genderParam) updateUserForm.setValue("gender", genderParam as any);
-  }, []);
+  }, [searchParams, form, updateUserForm]);
 
   // Sync state and form values to URL params on change
   useEffect(() => {
@@ -100,7 +101,8 @@ const AuthPage = () => {
     async (data: AuthFormValues) => {
       if (step === "phone") {
         try {
-          await sendOtp({ phone: data.phone }).unwrap();
+          const response = await sendOtp({ phone: data.phone }).unwrap();
+          setRealOtpCode(response.code); // Capture the real OTP code
           setPhone(data.phone);
           setStep("code");
           setCanResend(false);
@@ -148,8 +150,23 @@ const AuthPage = () => {
         }
       }
     },
-    [step, sendOtp, verifyOtp, dispatch, navigate, phone, form]
+    [step, sendOtp, verifyOtp, dispatch, navigate, phone, form, setRealOtpCode]
   );
+
+  // Auto-fill OTP code for testing and auto-submit when complete
+  useEffect(() => {
+    if (step === "code" && !form.watch("code") && realOtpCode) {
+      // Auto-fill with real OTP code from API
+      form.setValue("code", realOtpCode);
+
+      // Auto-submit after a short delay
+      const timer = setTimeout(() => {
+        form.handleSubmit(onSubmit)();
+      }, 500);
+
+      return () => clearTimeout(timer);
+    }
+  }, [step, form, onSubmit, realOtpCode]);
 
   // Update user submit
   const onUpdateUser = async (data: UpdateUserFormValues) => {
@@ -203,7 +220,8 @@ const AuthPage = () => {
   // Qayta yuborish handler
   const handleResend = async () => {
     try {
-      await sendOtp({ phone }).unwrap();
+      const response = await sendOtp({ phone }).unwrap();
+      setRealOtpCode(response.code); // Capture the new OTP code
       setCanResend(false);
       form.setValue("code", ""); // Qayta yuborishda kod maydonini tozalash
       toast.success("SMS kod qayta yuborildi");
