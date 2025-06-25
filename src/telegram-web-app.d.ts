@@ -1,4 +1,3 @@
-/* eslint-disable @typescript-eslint/no-explicit-any */
 // TypeScript declaration for Telegram WebApp API
 
 interface TelegramBackButton {
@@ -31,6 +30,7 @@ interface TelegramMainButton {
     text_color?: string;
     is_active?: boolean;
     is_visible?: boolean;
+    has_shine_effect?: boolean;
   }): TelegramMainButton;
 }
 
@@ -40,10 +40,21 @@ interface TelegramHapticFeedback {
   selectionChanged(): void;
 }
 
+interface TelegramThemeParams {
+  bg_color?: string;
+  text_color?: string;
+  hint_color?: string;
+  link_color?: string;
+  button_color?: string;
+  button_text_color?: string;
+  secondary_bg_color?: string;
+}
+
 interface TelegramWebApp {
   BackButton: TelegramBackButton;
   MainButton: TelegramMainButton;
   HapticFeedback: TelegramHapticFeedback;
+  themeParams: TelegramThemeParams;
   ready(): void;
   close(): void;
   expand(): void;
