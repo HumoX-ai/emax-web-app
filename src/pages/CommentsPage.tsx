@@ -20,7 +20,10 @@ import {
   useGetCommentsQuery,
   useCreateCommentMutation,
 } from "../store/api/commentsApi";
-import { useGetOrdersQuery } from "../store/api/ordersApi";
+import {
+  useGetOrdersQuery,
+  useGetOrderByIdQuery,
+} from "../store/api/ordersApi";
 import { formatDate } from "../utils/orderUtils";
 import { toast } from "sonner";
 
@@ -50,6 +53,14 @@ const CommentsPage = () => {
     offset: 0,
   });
 
+  // Buyurtma ma'lumotini olish (status tekshirish uchun)
+  const { data: orderData, isLoading: orderLoading } = useGetOrderByIdQuery(
+    filterOrderId!,
+    {
+      skip: !filterOrderId,
+    }
+  );
+
   // Orders olish (dropdown uchun)
   const { data: ordersData } = useGetOrdersQuery({
     limit: 100,
@@ -70,9 +81,35 @@ const CommentsPage = () => {
     setIsDialogOpen(true);
   };
 
+  // Foydalanuvchi allaqachon komment qoldirganligini tekshirish
+  const userAlreadyCommented = filterOrderId
+    ? commentsData?.comments.some(
+        (comment) => comment.orderId === filterOrderId
+      )
+    : false;
+
   const handleSubmitComment = async () => {
     if (!selectedOrderId || !newComment.text.trim()) {
       toast.error("Buyurtma va komment matni majburiy!");
+      return;
+    }
+
+    // Tanlangan buyurtma uchun status tekshirish
+    const selectedOrder = ordersData?.orders.find(
+      (order) => order._id === selectedOrderId
+    );
+    if (selectedOrder && selectedOrder.status !== "DONE") {
+      toast.error("Sharh faqat yakunlangan buyurtmalarga qoldiriladi!");
+      return;
+    }
+
+    // Foydalanuvchi allaqachon bu buyurtmaga sharh qoldirgan yoki qoldirmaganligini tekshirish
+    const userAlreadyCommented = commentsData?.comments.some(
+      (comment) => comment.orderId === selectedOrderId
+    );
+
+    if (userAlreadyCommented) {
+      toast.error("Siz bu buyurtmaga allaqachon sharh qoldirgan ekansiz!");
       return;
     }
 
@@ -124,7 +161,7 @@ const CommentsPage = () => {
     );
   };
 
-  if (commentsLoading) {
+  if (commentsLoading || (filterOrderId && orderLoading)) {
     return (
       <div className="p-4 pb-20">
         <h1 className="text-2xl font-bold mb-6">
@@ -202,88 +239,99 @@ const CommentsPage = () => {
           <h1 className="text-2xl font-bold">
             {filterOrderId ? "" : "Barcha sharxlar"}
           </h1>
-          <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-            <DialogTrigger asChild>
-              <Button onClick={handleWriteComment}>Komment yozish</Button>
-            </DialogTrigger>
-            <DialogContent className="sm:max-w-md">
-              <DialogHeader>
-                <DialogTitle>Yangi komment</DialogTitle>
-              </DialogHeader>
-              <div className="space-y-4">
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Buyurtmani tanlang
-                  </label>
-                  <select
-                    value={selectedOrderId}
-                    onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
-                      setSelectedOrderId(e.target.value)
-                    }
-                    className="w-full p-2 border rounded-md"
-                    disabled={!!filterOrderId}
-                  >
-                    <option value="">Buyurtmani tanlang</option>
-                    {ordersData?.orders.map((order) => (
-                      <option key={order._id} value={order._id}>
-                        #{order.orderNumber} - {order.name}
-                      </option>
-                    ))}
-                  </select>
-                  {filterOrderId && (
-                    <p className="text-xs text-gray-500 mt-1">
-                      Buyurtma avtomatik tanlangan
-                    </p>
-                  )}
-                </div>
+          {/* Faqat DONE statusdagi buyurtmalar uchun yoki umumiy sahifada komment yozish tugmasini ko'rsatish */}
+          {/* Agar user allaqachon komment qoldirgan bo'lsa, tugmani ko'rsatmaslik */}
+          {(!filterOrderId ||
+            (orderData &&
+              orderData.status === "DONE" &&
+              !userAlreadyCommented)) && (
+            <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
+              <DialogTrigger asChild>
+                <Button onClick={handleWriteComment}>Komment yozish</Button>
+              </DialogTrigger>
+              <DialogContent className="sm:max-w-md">
+                <DialogHeader>
+                  <DialogTitle>Yangi komment</DialogTitle>
+                </DialogHeader>
+                <div className="space-y-4">
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">
+                      Buyurtmani tanlang
+                    </label>
+                    <select
+                      value={selectedOrderId}
+                      onChange={(e: React.ChangeEvent<HTMLSelectElement>) =>
+                        setSelectedOrderId(e.target.value)
+                      }
+                      className="w-full p-2 border rounded-md"
+                      disabled={!!filterOrderId}
+                    >
+                      <option value="">Buyurtmani tanlang</option>
+                      {ordersData?.orders
+                        .filter((order) => order.status === "DONE")
+                        .map((order) => (
+                          <option key={order._id} value={order._id}>
+                            #{order.orderNumber} - {order.name}
+                          </option>
+                        ))}
+                    </select>
+                    {filterOrderId && (
+                      <p className="text-xs text-gray-500 mt-1">
+                        Buyurtma avtomatik tanlangan
+                      </p>
+                    )}
+                  </div>
 
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Baho ({newComment.stars}/5)
-                  </label>
-                  {renderStars(newComment.stars, true, (star) =>
-                    setNewComment((prev) => ({ ...prev, stars: star }))
-                  )}
-                </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">
+                      Baho ({newComment.stars}/5)
+                    </label>
+                    {renderStars(newComment.stars, true, (star) =>
+                      setNewComment((prev) => ({ ...prev, stars: star }))
+                    )}
+                  </div>
 
-                <div>
-                  <label className="text-sm font-medium mb-2 block">
-                    Komment matni
-                  </label>
-                  <Textarea
-                    value={newComment.text}
-                    onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
-                      setNewComment((prev) => ({
-                        ...prev,
-                        text: e.target.value,
-                      }))
-                    }
-                    placeholder="Sizning fikringiz..."
-                    rows={4}
-                  />
-                </div>
+                  <div>
+                    <label className="text-sm font-medium mb-2 block">
+                      Komment matni
+                    </label>
+                    <Textarea
+                      value={newComment.text}
+                      onChange={(e: React.ChangeEvent<HTMLTextAreaElement>) =>
+                        setNewComment((prev) => ({
+                          ...prev,
+                          text: e.target.value,
+                        }))
+                      }
+                      placeholder="Sizning fikringiz..."
+                      rows={4}
+                    />
+                  </div>
 
-                <div className="flex gap-2">
-                  <Button
-                    onClick={handleSubmitComment}
-                    disabled={
-                      isCreating || !selectedOrderId || !newComment.text.trim()
-                    }
-                    className="flex-1"
-                  >
-                    {isCreating ? "Yuborilmoqda..." : "Yuborish"}
-                  </Button>
-                  <Button
-                    variant="outline"
-                    onClick={() => setIsDialogOpen(false)}
-                    disabled={isCreating}
-                  >
-                    Bekor qilish
-                  </Button>
+                  <div className="flex gap-2">
+                    <Button
+                      onClick={handleSubmitComment}
+                      disabled={
+                        isCreating ||
+                        !selectedOrderId ||
+                        !newComment.text.trim()
+                      }
+                      className="flex-1"
+                    >
+                      {isCreating ? "Yuborilmoqda..." : "Yuborish"}
+                    </Button>
+                    <Button
+                      variant="outline"
+                      onClick={() => setIsDialogOpen(false)}
+                      disabled={isCreating}
+                    >
+                      Bekor qilish
+                    </Button>
+                  </div>
                 </div>
-              </div>
-            </DialogContent>
-          </Dialog>
+              </DialogContent>
+            </Dialog>
+          )}
         </div>
       </div>
 
@@ -297,9 +345,26 @@ const CommentsPage = () => {
                     ? "Bu buyurtma uchun hali komment yo'q"
                     : "Hali sharxlar yo'q"}
                 </p>
-                <Button onClick={handleWriteComment} variant="outline">
-                  Birinchi kommentni qoldiring
-                </Button>
+                {/* Faqat DONE statusdagi buyurtmalar uchun yoki umumiy sahifada tugmani ko'rsatish */}
+                {/* Agar user allaqachon komment qoldirgan bo'lsa, tugmani ko'rsatmaslik */}
+                {(!filterOrderId ||
+                  (orderData &&
+                    orderData.status === "DONE" &&
+                    !userAlreadyCommented)) && (
+                  <Button onClick={handleWriteComment} variant="outline">
+                    Birinchi kommentni qoldiring
+                  </Button>
+                )}
+                {filterOrderId && orderData && orderData.status !== "DONE" && (
+                  <p className="text-gray-400 text-sm">
+                    Sharh faqat yakunlangan buyurtmalarga qoldiriladi
+                  </p>
+                )}
+                {filterOrderId && userAlreadyCommented && (
+                  <p className="text-gray-400 text-sm">
+                    Siz bu buyurtmaga allaqachon sharh qoldirgan ekansiz
+                  </p>
+                )}
               </div>
             </CardContent>
           </Card>

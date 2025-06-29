@@ -7,19 +7,33 @@ import {
 import { useTelegramHaptic } from "../hooks/useTelegramHaptic";
 import { useGetOrdersQuery } from "../store/api/ordersApi";
 import FloatingMessagesButton from "../components/FloatingMessagesButton";
+import { useNavigate } from "react-router";
 
 const HomePage = () => {
+  const navigate = useNavigate();
   const { impactFeedback } = useTelegramHaptic();
   const { data: ordersData } = useGetOrdersQuery({});
 
   // Buyurtmalar statistikasini hisoblash
   const activeOrders =
     ordersData?.orders?.filter((order) =>
-      ["PENDING", "PROCESSING", "SHIPPED"].includes(order.status)
+      ["PENDING", "IN_PROCESS", "IN_BORDER", "DONE"].includes(order.status)
     ).length || 0;
 
   const completedOrders =
     ordersData?.orders?.filter((order) => order.status === "DONE").length || 0;
+
+  const handleActiveOrdersClick = () => {
+    impactFeedback("light");
+    // Faol buyurtmalar uchun PENDING status bilan navigate qilish
+    navigate("/orders", { state: { filterStatus: undefined } });
+  };
+
+  const handleCompletedOrdersClick = () => {
+    impactFeedback("light");
+    // Yakunlangan buyurtmalar uchun DONE status bilan navigate qilish
+    navigate("/orders", { state: { filterStatus: "DONE" } });
+  };
 
   const handleHelp = () => {
     // Light impact for secondary actions
@@ -46,7 +60,10 @@ const HomePage = () => {
         </Card>
 
         <div className="grid grid-cols-2 gap-4">
-          <Card>
+          <Card
+            className="cursor-pointer hover:shadow-md transition-shadow"
+            onClick={handleActiveOrdersClick}
+          >
             <CardContent className="pt-6">
               <div className="text-center">
                 <div className="w-12 h-12 bg-blue-100 rounded-lg flex items-center justify-center mx-auto mb-3">
@@ -64,7 +81,7 @@ const HomePage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="font-medium text-sm">Faol buyurtmalar</h3>
+                <h3 className="font-medium text-sm">Barcha buyurtmalar</h3>
                 <p className="text-2xl font-bold text-blue-600">
                   {activeOrders}
                 </p>
@@ -72,7 +89,10 @@ const HomePage = () => {
             </CardContent>
           </Card>
 
-          <Card>
+          <Card
+            className="cursor-pointer hover:shadow-md transition-shadow"
+            onClick={handleCompletedOrdersClick}
+          >
             <CardContent className="pt-6">
               <div className="text-center">
                 <div className="w-12 h-12 bg-green-100 rounded-lg flex items-center justify-center mx-auto mb-3">
@@ -90,7 +110,7 @@ const HomePage = () => {
                     />
                   </svg>
                 </div>
-                <h3 className="font-medium text-sm">Yakunlangan</h3>
+                <h3 className="font-medium text-sm">Yakunlangan buyurtmalar</h3>
                 <p className="text-2xl font-bold text-green-600">
                   {completedOrders}
                 </p>

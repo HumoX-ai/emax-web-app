@@ -4,7 +4,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { useNavigate } from "react-router";
+import { useNavigate, useLocation } from "react-router";
 import { useGetOrdersQuery } from "../store/api/ordersApi";
 import {
   getOrderStatusInfo,
@@ -13,7 +13,7 @@ import {
   formatDate,
 } from "../utils/orderUtils";
 import { useTelegramHaptic } from "../hooks/useTelegramHaptic";
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import FloatingMessagesButton from "../components/FloatingMessagesButton";
 
 const ORDER_STATUSES = [
@@ -25,18 +25,33 @@ const ORDER_STATUSES = [
 ];
 
 const OrdersPage = () => {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const { impactFeedback } = useTelegramHaptic();
+
+  // Location state dan filterStatus ni olish
+  const filterStatus = (location.state as { filterStatus?: string })
+    ?.filterStatus;
+
   const [status, setStatus] = useState<string | undefined>(
-    ORDER_STATUSES[0].value
+    filterStatus || ORDER_STATUSES[0].value
   );
   const limit = 10;
   const [offset, setOffset] = useState<number>(0);
+
+  // HomePage dan kelgan filter bo'yicha status ni o'rnatish
+  useEffect(() => {
+    if (filterStatus) {
+      setStatus(filterStatus);
+      setOffset(0);
+    }
+  }, [filterStatus]);
+
   const { data, isLoading, isFetching, error } = useGetOrdersQuery({
     status,
     limit,
     offset,
   });
-  const { impactFeedback } = useTelegramHaptic();
-  const navigate = useNavigate();
 
   const handleOrderClick = (orderId: string) => {
     impactFeedback("light");

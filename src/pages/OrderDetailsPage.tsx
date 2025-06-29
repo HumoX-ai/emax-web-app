@@ -393,7 +393,10 @@ const OrderDetailsPage = () => {
               <button
                 onClick={() => {
                   impactFeedback("light");
-                  window.open(order.contractFile, "_blank");
+                  window.open(
+                    `https://file.emaxb.uz/api/files?key=${order.contractFile}`,
+                    "_blank"
+                  );
                 }}
                 className="w-full flex items-center justify-between p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors border border-purple-200"
               >

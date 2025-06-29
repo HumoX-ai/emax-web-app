@@ -12,10 +12,12 @@ import {
   formatPrice,
   formatDate,
 } from "../utils/paymentUtils";
+import { useTelegramHaptic } from "../hooks/useTelegramHaptic";
 
 const PaymentsPage = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
+  const { impactFeedback } = useTelegramHaptic();
   const orderId = searchParams.get("orderId");
   const limit = 10;
   const [offset, setOffset] = useState<number>(0);
@@ -242,10 +244,55 @@ const PaymentsPage = () => {
                     {payment.seller.fullName}
                   </p>
                   {payment.document && (
-                    <p className="text-sm text-gray-600">
-                      <span className="font-medium">Hujjat:</span>{" "}
-                      {payment.document}
-                    </p>
+                    <div className="mt-3 pt-3 border-t">
+                      <button
+                        onClick={() => {
+                          impactFeedback("light");
+                          window.open(
+                            `https://file.emaxb.uz/api/files?key=${payment.document}`,
+                            "_blank"
+                          );
+                        }}
+                        className="w-full flex items-center justify-between p-3 bg-purple-50 hover:bg-purple-100 rounded-lg transition-colors border border-purple-200"
+                      >
+                        <div className="flex items-center gap-3">
+                          <svg
+                            className="w-5 h-5 text-purple-600"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M12 10v6m0 0l-3-3m3 3l3-3m2 8H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                            />
+                          </svg>
+                          <div className="text-left">
+                            <p className="font-medium text-purple-800">
+                              To'lov hujjati
+                            </p>
+                            <p className="text-sm text-purple-600">
+                              Hujjatni yuklab olish
+                            </p>
+                          </div>
+                        </div>
+                        <svg
+                          className="w-5 h-5 text-purple-600"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                          />
+                        </svg>
+                      </button>
+                    </div>
                   )}
                 </div>
               </CardContent>

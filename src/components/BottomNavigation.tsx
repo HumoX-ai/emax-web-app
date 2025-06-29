@@ -84,7 +84,7 @@ const BottomNavigation = () => {
     // },
     {
       path: "/comments",
-      label: "sharxlar",
+      label: "Sharxlar",
       icon: (
         <svg
           className="w-6 h-6"
