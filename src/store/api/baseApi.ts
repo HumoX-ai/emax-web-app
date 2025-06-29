@@ -16,9 +16,15 @@ const baseQueryWithAuth = (baseUrl: string) => {
 
   return async (args: any, api: any, extraOptions: any) => {
     const result = await baseQuery(args, api, extraOptions);
-    if (result.error && result.error.status === 500) {
-      localStorage.removeItem("token");
-      api.dispatch(logout());
+    if (result.error) {
+      if (result.error.status === 401) {
+        localStorage.removeItem("token");
+        api.dispatch(logout());
+        window.location.reload(); // Refresh page to force redirect to Auth
+      } else if (result.error.status === 500) {
+        localStorage.removeItem("token");
+        api.dispatch(logout());
+      }
     }
     return result;
   };

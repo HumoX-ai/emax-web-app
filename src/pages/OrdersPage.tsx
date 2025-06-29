@@ -4,7 +4,7 @@ import {
   CardHeader,
   CardTitle,
 } from "../components/ui/card";
-import { useNavigate, useLocation } from "react-router";
+import { useNavigate, useSearchParams } from "react-router";
 import { useGetOrdersQuery } from "../store/api/ordersApi";
 import {
   getOrderStatusInfo,
@@ -25,27 +25,24 @@ const ORDER_STATUSES = [
 ];
 
 const OrdersPage = () => {
-  const location = useLocation();
   const navigate = useNavigate();
   const { impactFeedback } = useTelegramHaptic();
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  // Location state dan filterStatus ni olish
-  const filterStatus = (location.state as { filterStatus?: string })
-    ?.filterStatus;
-
-  const [status, setStatus] = useState<string | undefined>(
-    filterStatus || ORDER_STATUSES[0].value
-  );
+  // Statusni searchParams dan olish
+  const statusParam = searchParams.get("status");
+  const status =
+    typeof statusParam === "string"
+      ? statusParam === "undefined"
+        ? undefined
+        : statusParam
+      : ORDER_STATUSES[0].value;
   const limit = 10;
   const [offset, setOffset] = useState<number>(0);
 
-  // HomePage dan kelgan filter bo'yicha status ni o'rnatish
   useEffect(() => {
-    if (filterStatus) {
-      setStatus(filterStatus);
-      setOffset(0);
-    }
-  }, [filterStatus]);
+    setOffset(0); // status o'zgarsa, offsetni 0 ga qaytarish
+  }, [status]);
 
   const { data, isLoading, isFetching, error } = useGetOrdersQuery({
     status,
@@ -74,11 +71,24 @@ const OrdersPage = () => {
             <button
               key={s.value}
               className={`inline-block px-3 py-1 rounded-full border text-sm ${
-                status === s.value
+                status === s.value ||
+                (typeof status === "undefined" &&
+                  typeof s.value === "undefined")
                   ? "bg-blue-500 text-white"
                   : "bg-white text-gray-700"
               }`}
-              onClick={() => setStatus(s.value)}
+              onClick={() => {
+                setSearchParams((prev) => {
+                  const params = new URLSearchParams(prev);
+                  if (typeof s.value === "undefined") {
+                    params.delete("status");
+                  } else {
+                    params.set("status", s.value);
+                  }
+                  return params;
+                });
+                setOffset(0);
+              }}
             >
               {s.label}
             </button>
@@ -113,11 +123,24 @@ const OrdersPage = () => {
             <button
               key={s.value}
               className={`inline-block px-3 py-1 rounded-full border text-sm ${
-                status === s.value
+                status === s.value ||
+                (typeof status === "undefined" &&
+                  typeof s.value === "undefined")
                   ? "bg-blue-500 text-white"
                   : "bg-white text-gray-700"
               }`}
-              onClick={() => setStatus(s.value)}
+              onClick={() => {
+                setSearchParams((prev) => {
+                  const params = new URLSearchParams(prev);
+                  if (typeof s.value === "undefined") {
+                    params.delete("status");
+                  } else {
+                    params.set("status", s.value);
+                  }
+                  return params;
+                });
+                setOffset(0);
+              }}
             >
               {s.label}
             </button>
@@ -151,11 +174,24 @@ const OrdersPage = () => {
             <button
               key={s.value}
               className={`inline-block px-3 py-1 rounded-full border text-sm ${
-                status === s.value
+                status === s.value ||
+                (typeof status === "undefined" &&
+                  typeof s.value === "undefined")
                   ? "bg-blue-500 text-white"
                   : "bg-white text-gray-700"
               }`}
-              onClick={() => setStatus(s.value)}
+              onClick={() => {
+                setSearchParams((prev) => {
+                  const params = new URLSearchParams(prev);
+                  if (typeof s.value === "undefined") {
+                    params.delete("status");
+                  } else {
+                    params.set("status", s.value);
+                  }
+                  return params;
+                });
+                setOffset(0);
+              }}
             >
               {s.label}
             </button>
@@ -202,13 +238,22 @@ const OrdersPage = () => {
           <button
             key={s.value}
             className={`inline-block px-3 py-1 rounded-full border text-sm ${
-              status === s.value
+              status === s.value ||
+              (typeof status === "undefined" && typeof s.value === "undefined")
                 ? "bg-blue-500 text-white"
                 : "bg-white text-gray-700"
             }`}
             onClick={() => {
-              setStatus(s.value);
-              setOffset(0); // filter o'zgarsa, offsetni 0 ga qaytarish
+              setSearchParams((prev) => {
+                const params = new URLSearchParams(prev);
+                if (typeof s.value === "undefined") {
+                  params.delete("status");
+                } else {
+                  params.set("status", s.value);
+                }
+                return params;
+              });
+              setOffset(0);
             }}
           >
             {s.label}

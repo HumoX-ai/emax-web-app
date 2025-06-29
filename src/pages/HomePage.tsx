@@ -25,14 +25,14 @@ const HomePage = () => {
 
   const handleActiveOrdersClick = () => {
     impactFeedback("light");
-    // Faol buyurtmalar uchun PENDING status bilan navigate qilish
-    navigate("/orders", { state: { filterStatus: undefined } });
+    // Barcha buyurtmalar uchun status parametrsiz navigate qilish
+    navigate("/orders");
   };
 
   const handleCompletedOrdersClick = () => {
     impactFeedback("light");
-    // Yakunlangan buyurtmalar uchun DONE status bilan navigate qilish
-    navigate("/orders", { state: { filterStatus: "DONE" } });
+    // Yakunlangan buyurtmalar uchun status=\"DONE\" bilan navigate qilish
+    navigate("/orders?status=DONE");
   };
 
   const handleHelp = () => {

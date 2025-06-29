@@ -263,50 +263,51 @@ const OrderDetailsPage = () => {
         </CardHeader>
         <CardContent>
           <div className="space-y-3">
-            <button
-              onClick={handleCommentClick}
-              className="w-full flex items-center justify-between p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200"
-            >
-              <div className="flex items-center gap-3">
+            {order.status === "DONE" && (
+              <button
+                onClick={handleCommentClick}
+                className="w-full flex items-center justify-between p-3 bg-blue-50 hover:bg-blue-100 rounded-lg transition-colors border border-blue-200"
+              >
+                <div className="flex items-center gap-3">
+                  <svg
+                    className="w-5 h-5 text-blue-600"
+                    fill="currentColor"
+                    viewBox="0 0 20 20"
+                  >
+                    <path
+                      fillRule="evenodd"
+                      d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
+                      clipRule="evenodd"
+                    />
+                  </svg>
+                  <div className="text-left">
+                    <p className="font-medium text-blue-800">
+                      {order.hasComment
+                        ? "Sharhlarni ko'rish"
+                        : "Sharh qoldirish"}
+                    </p>
+                    <p className="text-sm text-blue-600">
+                      {order.hasComment
+                        ? "Mavjud sharhlarni ko'ring"
+                        : "Buyurtma haqida fikr bildiring"}
+                    </p>
+                  </div>
+                </div>
                 <svg
                   className="w-5 h-5 text-blue-600"
-                  fill="currentColor"
-                  viewBox="0 0 20 20"
+                  fill="none"
+                  stroke="currentColor"
+                  viewBox="0 0 24 24"
                 >
                   <path
-                    fillRule="evenodd"
-                    d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
-                    clipRule="evenodd"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M9 5l7 7-7 7"
                   />
                 </svg>
-                <div className="text-left">
-                  <p className="font-medium text-blue-800">
-                    {order.hasComment
-                      ? "Sharhlarni ko'rish"
-                      : "Sharh qoldirish"}
-                  </p>
-                  <p className="text-sm text-blue-600">
-                    {order.hasComment
-                      ? "Mavjud sharhlarni ko'ring"
-                      : "Buyurtma haqida fikr bildiring"}
-                  </p>
-                </div>
-              </div>
-              <svg
-                className="w-5 h-5 text-blue-600"
-                fill="none"
-                stroke="currentColor"
-                viewBox="0 0 24 24"
-              >
-                <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M9 5l7 7-7 7"
-                />
-              </svg>
-            </button>
-
+              </button>
+            )}
             <button
               onClick={handleMessagesClick}
               className="w-full flex items-center justify-between p-3 bg-orange-50 hover:bg-orange-100 rounded-lg transition-colors border border-orange-200"

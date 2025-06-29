@@ -246,9 +246,7 @@ const CommentsPage = () => {
               orderData.status === "DONE" &&
               !userAlreadyCommented)) && (
             <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-              <DialogTrigger asChild>
-                <Button onClick={handleWriteComment}>Komment yozish</Button>
-              </DialogTrigger>
+              <DialogTrigger asChild></DialogTrigger>
               <DialogContent className="sm:max-w-md">
                 <DialogHeader>
                   <DialogTitle>Yangi komment</DialogTitle>
