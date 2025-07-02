@@ -327,9 +327,13 @@ const OrderDetailsPage = () => {
                   />
                 </svg>
                 <div className="text-left">
-                  <p className="font-medium text-orange-800">Xabarlar</p>
+                  <p className="font-medium text-orange-800">
+                    {order.hasChat ? "Xabarlar" : "Chat boshlash"}
+                  </p>
                   <p className="text-sm text-orange-600">
-                    Sotuvchi bilan muloqot qiling
+                    {order.hasChat
+                      ? "Sotuvchi bilan muloqot qiling"
+                      : "Sotuvchi bilan chat boshlang"}
                   </p>
                 </div>
               </div>

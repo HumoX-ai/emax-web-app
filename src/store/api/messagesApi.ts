@@ -66,6 +66,18 @@ export const messagesApi = createApi({
         body,
       }),
       invalidatesTags: ["Message"],
+      async onQueryStarted(_arg, { dispatch, queryFulfilled }) {
+        try {
+          await queryFulfilled;
+          // Invalidate orders cache to refresh hasChat status
+          dispatch({
+            type: "ordersApi/util/invalidateTags",
+            payload: ["Order"],
+          });
+        } catch {
+          // ignore
+        }
+      },
     }),
   }),
 });

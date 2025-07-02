@@ -17,7 +17,14 @@ const HomePage = () => {
   // Buyurtmalar statistikasini hisoblash
   const activeOrders =
     ordersData?.orders?.filter((order) =>
-      ["PENDING", "IN_PROCESS", "IN_BORDER", "DONE"].includes(order.status)
+      [
+        "PENDING",
+        "IN_WAREHOUSE",
+        "IN_PROCESS",
+        "IN_BORDER",
+        "IN_CUSTOMS",
+        "DONE",
+      ].includes(order.status)
     ).length || 0;
 
   const completedOrders =

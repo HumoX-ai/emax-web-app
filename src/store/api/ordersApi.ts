@@ -6,6 +6,7 @@ export interface Order {
   userId: string;
   orderNumber: number;
   hasComment: boolean;
+  hasChat: boolean;
   sellerId: string;
   name: string;
   description: string;
@@ -13,7 +14,13 @@ export interface Order {
   price: number;
   paidAmount: number;
   contractFile: string;
-  status: "PENDING" | "IN_PROCESS" | "IN_BORDER" | "DONE";
+  status:
+    | "PENDING"
+    | "IN_WAREHOUSE"
+    | "IN_PROCESS"
+    | "IN_BORDER"
+    | "IN_CUSTOMS"
+    | "DONE";
   paymentStatus: "UNPAID" | "PARTIAL" | "PAID";
   isDeleted: boolean;
   createdAt: string;

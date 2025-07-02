@@ -6,9 +6,13 @@ import { Input } from "../components/ui/input";
 import {
   useGetMessagesQuery,
   useCreateMessageMutation,
+  type Message,
 } from "../store/api/messagesApi";
+import { useGetOrderByIdQuery } from "../store/api/ordersApi";
+import { StartChatModal } from "../components/chat/StartChatModal";
 import { useTelegramHaptic } from "../hooks/useTelegramHaptic";
 import { useTelegramWebApp } from "../hooks/useTelegramWebApp";
+import { useSocket } from "../hooks/useSocket";
 import { formatDate } from "../utils/orderUtils";
 
 const MessagesPage = () => {
@@ -17,7 +21,10 @@ const MessagesPage = () => {
   const { impactFeedback } = useTelegramHaptic();
   const { isTelegramWebApp } = useTelegramWebApp();
   const [messageText, setMessageText] = useState("");
+  const [showStartChatModal, setShowStartChatModal] = useState(false);
+  const [realtimeMessages, setRealtimeMessages] = useState<Message[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
+  const { on, off } = useSocket(true);
 
   // Telegram WebApp viewport expand va scroll fix
   useEffect(() => {
@@ -56,6 +63,11 @@ const MessagesPage = () => {
     urlParams.get("orderId") ||
     (location.state as { orderId?: string })?.orderId;
 
+  // Fetch order data to check hasChat field
+  const { data: orderData } = useGetOrderByIdQuery(orderId!, {
+    skip: !orderId,
+  });
+
   const {
     data: messagesData,
     isLoading,
@@ -67,10 +79,69 @@ const MessagesPage = () => {
 
   const [createMessage, { isLoading: isSending }] = useCreateMessageMutation();
 
+  // Check if chat exists and show modal if not
+  useEffect(() => {
+    if (orderId && orderData && !orderData.hasChat) {
+      setShowStartChatModal(true);
+    }
+  }, [orderId, orderData]);
+
+  // Socket event handling for real-time messages
+  useEffect(() => {
+    if (!orderId) return;
+
+    const handleNewMessage = (data: unknown) => {
+      const message = data as Message;
+      // Only add message if it belongs to current order
+      if (message.orderId === orderId) {
+        setRealtimeMessages((prev) => {
+          // Check if message already exists to prevent duplicates
+          const exists = prev.some((msg) => msg._id === message._id);
+          if (exists) return prev;
+          return [...prev, message];
+        });
+        // Auto scroll to bottom when new message arrives
+        setTimeout(() => scrollToBottom(), 100);
+      }
+    };
+
+    // Listen for new messages
+    on("newMessage", handleNewMessage);
+
+    // Cleanup
+    return () => {
+      off("newMessage", handleNewMessage);
+    };
+  }, [orderId, on, off]);
+
+  // Combine server messages with real-time messages
+  const allMessages = [...(messagesData?.messages || []), ...realtimeMessages];
+
+  // Remove duplicates based on message ID
+  const uniqueMessages = allMessages
+    .filter(
+      (message, index, array) =>
+        array.findIndex((m) => m._id === message._id) === index
+    )
+    .sort(
+      (a, b) =>
+        new Date(a.createdAt).getTime() - new Date(b.createdAt).getTime()
+    );
+
+  const handleChatCreated = () => {
+    // Clear real-time messages when chat is created
+    setRealtimeMessages([]);
+    // Refetch order data to update hasChat status
+    if (orderData) {
+      // Force refresh the order data
+      window.location.reload();
+    }
+  };
+
   // Auto scroll to bottom when new messages are loaded
   useEffect(() => {
     scrollToBottom();
-  }, [messagesData?.messages]);
+  }, [uniqueMessages]);
 
   const scrollToBottom = () => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
@@ -86,6 +157,8 @@ const MessagesPage = () => {
         text: messageText.trim(),
       }).unwrap();
       setMessageText("");
+      // Clear real-time messages since we'll refetch from server
+      setRealtimeMessages([]);
       // Refetch messages to get the latest state
       setTimeout(() => refetch(), 100);
     } catch (error) {
@@ -214,7 +287,7 @@ const MessagesPage = () => {
     );
   }
 
-  const messages = messagesData?.messages || [];
+  const messages = uniqueMessages;
 
   return (
     <div className="flex flex-col h-screen bg-gray-50 fixed top-0 left-0 right-0 bottom-0">
@@ -369,10 +442,21 @@ const MessagesPage = () => {
             )}
           </Button>
         </div>
-        <div className="mt-2 text-xs text-gray-500 text-right">
+        {/* <div className="mt-2 text-xs text-gray-500 text-right">
           {messageText.length}/1000
-        </div>
+        </div> */}
       </div>
+
+      {/* Start Chat Modal */}
+      {orderId && orderData && (
+        <StartChatModal
+          isOpen={showStartChatModal}
+          onClose={() => setShowStartChatModal(false)}
+          orderId={orderId}
+          orderNumber={orderData.orderNumber}
+          onChatCreated={handleChatCreated}
+        />
+      )}
     </div>
   );
 };

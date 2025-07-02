@@ -6,6 +6,7 @@ import { ordersApi } from "./api/ordersApi";
 import { paymentsApi } from "./api/paymentsApi";
 import { commentsApi } from "./api/commentsApi";
 import { messagesApi } from "./api/messagesApi";
+import { chatsApi } from "./api/chatsApi";
 
 export const store = configureStore({
   reducer: {
@@ -16,6 +17,7 @@ export const store = configureStore({
     [paymentsApi.reducerPath]: paymentsApi.reducer,
     [commentsApi.reducerPath]: commentsApi.reducer,
     [messagesApi.reducerPath]: messagesApi.reducer,
+    [chatsApi.reducerPath]: chatsApi.reducer,
   },
   middleware: (getDefaultMiddleware) =>
     getDefaultMiddleware().concat(
@@ -24,7 +26,8 @@ export const store = configureStore({
       ordersApi.middleware,
       paymentsApi.middleware,
       commentsApi.middleware,
-      messagesApi.middleware
+      messagesApi.middleware,
+      chatsApi.middleware
     ),
 });
 

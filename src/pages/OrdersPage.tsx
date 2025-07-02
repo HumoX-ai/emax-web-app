@@ -19,8 +19,10 @@ import FloatingMessagesButton from "../components/FloatingMessagesButton";
 const ORDER_STATUSES = [
   { value: undefined, label: "Barchasi" },
   { value: "PENDING", label: "Kutilmoqda" },
+  { value: "IN_WAREHOUSE", label: "Omborda" },
   { value: "IN_PROCESS", label: "Jarayonda" },
   { value: "IN_BORDER", label: "Chegarada" },
+  { value: "IN_CUSTOMS", label: "Bojxonada" },
   { value: "DONE", label: "Yakunlangan" },
 ];
 
@@ -367,6 +369,24 @@ const OrdersPage = () => {
                       </span>
                     </div>
                   )}
+                  {order.hasChat && (
+                    <div className="flex items-center gap-1 mt-2">
+                      <svg
+                        className="w-4 h-4 text-green-500"
+                        fill="currentColor"
+                        viewBox="0 0 20 20"
+                      >
+                        <path
+                          fillRule="evenodd"
+                          d="M18 10c0 3.866-3.582 7-8 7a8.841 8.841 0 01-4.083-.98L2 17l1.338-3.123C2.493 12.767 2 11.434 2 10c0-3.866 3.582-7 8-7s8 3.134 8 7zM7 9H5v2h2V9zm8 0h-2v2h2V9zM9 9h2v2H9V9z"
+                          clipRule="evenodd"
+                        />
+                      </svg>
+                      <span className="text-xs text-green-600">
+                        Chat mavjud
+                      </span>
+                    </div>
+                  )}
                   <div className="flex gap-2 mt-3">
                     <button
                       onClick={(e) => {
@@ -386,7 +406,7 @@ const OrdersPage = () => {
                       }}
                       className="px-3 py-1 bg-orange-500 text-white text-xs rounded-full hover:bg-orange-600 transition-colors"
                     >
-                      Xabarlar
+                      {order.hasChat ? "Xabarlar" : "Chat boshlash"}
                     </button>
                   </div>
                 </div>

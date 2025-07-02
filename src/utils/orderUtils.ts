@@ -8,6 +8,13 @@ export const getOrderStatusInfo = (status: string) => {
         bgColor: "bg-yellow-50",
         borderColor: "border-yellow-200",
       };
+    case "IN_WAREHOUSE":
+      return {
+        text: "Omborda",
+        color: "text-indigo-600",
+        bgColor: "bg-indigo-50",
+        borderColor: "border-indigo-200",
+      };
     case "IN_PROCESS":
       return {
         text: "Jarayonda",
@@ -21,6 +28,13 @@ export const getOrderStatusInfo = (status: string) => {
         color: "text-purple-600",
         bgColor: "bg-purple-50",
         borderColor: "border-purple-200",
+      };
+    case "IN_CUSTOMS":
+      return {
+        text: "Bojxonada",
+        color: "text-pink-600",
+        bgColor: "bg-pink-50",
+        borderColor: "border-pink-200",
       };
     case "DONE":
       return {
