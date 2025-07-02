@@ -23,7 +23,7 @@ const ORDER_STATUSES = [
   { value: "IN_PROCESS", label: "Jarayonda" },
   { value: "IN_BORDER", label: "Chegarada" },
   { value: "IN_CUSTOMS", label: "Bojxonada" },
-  { value: "DONE", label: "Yakunlangan" },
+  { value: "DONE", label: "Tayyor" },
 ];
 
 const OrdersPage = () => {
