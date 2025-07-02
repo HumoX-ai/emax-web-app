@@ -192,7 +192,7 @@ const OrderDetailsPage = () => {
           <div className="space-y-4">
             <div>
               <h3 className="font-semibold text-gray-800 mb-2">
-                Mahsulot ma'lumotlari
+                Yuk rasmi va ma’lumotlari
               </h3>
               {order.photo && (
                 <div className="mb-3">

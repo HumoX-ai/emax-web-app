@@ -17,7 +17,7 @@ export const getOrderStatusInfo = (status: string) => {
       };
     case "IN_PROCESS":
       return {
-        text: "Jarayonda",
+        text: "Tayyor&Yo'lda",
         color: "text-blue-600",
         bgColor: "bg-blue-50",
         borderColor: "border-blue-200",
