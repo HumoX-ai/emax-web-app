@@ -1,7 +1,6 @@
 import { useState, useEffect, useRef } from "react";
 import { useLocation, useNavigate } from "react-router";
 import { Card, CardContent } from "../components/ui/card";
-import { Button } from "../components/ui/button";
 import { Input } from "../components/ui/input";
 import {
   useGetMessagesQuery,
@@ -25,6 +24,11 @@ const MessagesPage = () => {
   const [realtimeMessages, setRealtimeMessages] = useState<Message[]>([]);
   const messagesEndRef = useRef<HTMLDivElement>(null);
   const { on, off } = useSocket(true);
+  // iOS aniqlash va input focus state
+  const isIOS =
+    typeof window !== "undefined" &&
+    /iPhone|iPad|iPod/i.test(navigator.userAgent);
+  const [isFocused, setIsFocused] = useState(false);
 
   // Telegram WebApp viewport expand va scroll fix
   useEffect(() => {
@@ -39,10 +43,16 @@ const MessagesPage = () => {
       document.body.style.height = "100%";
       document.documentElement.style.overflow = "hidden";
 
-      // Telegram WebApp specific fixes
-      document.body.style.touchAction = "none";
+      // Telegram WebApp specific fixes - REMOVE touchAction: "none" for iOS compatibility
       document.body.style.userSelect = "none";
       document.body.style.webkitUserSelect = "none";
+
+      // iOS specific fixes using setProperty for webkit properties
+      document.body.style.setProperty("-webkit-touch-callout", "none");
+      document.body.style.setProperty(
+        "-webkit-tap-highlight-color",
+        "transparent"
+      );
     }
 
     return () => {
@@ -51,9 +61,10 @@ const MessagesPage = () => {
       document.body.style.width = "unset";
       document.body.style.height = "unset";
       document.documentElement.style.overflow = "unset";
-      document.body.style.touchAction = "unset";
       document.body.style.userSelect = "unset";
       document.body.style.webkitUserSelect = "unset";
+      document.body.style.removeProperty("-webkit-touch-callout");
+      document.body.style.removeProperty("-webkit-tap-highlight-color");
     };
   }, [isTelegramWebApp]);
 
@@ -167,12 +178,46 @@ const MessagesPage = () => {
     }
   };
 
+  // Handle button press for iOS compatibility
+  const handleButtonPress = () => {
+    // Only proceed if not sending and there's message text
+    if (!messageText.trim() || isSending) return;
+
+    handleSendMessage();
+  };
+
+  // Separate touch handler for iOS
+  const handleTouchStart = (e: React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+    handleButtonPress();
+  };
+
+  // Additional touch end handler for better iOS compatibility
+  const handleTouchEnd = (e: React.TouchEvent) => {
+    e.preventDefault();
+    e.stopPropagation();
+  };
+
   const handleKeyPress = (e: React.KeyboardEvent) => {
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSendMessage();
     }
   };
+
+  // Handle iOS viewport resize when keyboard appears
+  useEffect(() => {
+    const handleViewportResize = () => {
+      // For iOS, when keyboard appears, auto-scroll to bottom
+      if (isTelegramWebApp) {
+        setTimeout(() => scrollToBottom(), 100);
+      }
+    };
+
+    window.addEventListener("resize", handleViewportResize);
+    return () => window.removeEventListener("resize", handleViewportResize);
+  }, [isTelegramWebApp]);
 
   if (!orderId) {
     return (
@@ -393,23 +438,43 @@ const MessagesPage = () => {
       </div>
 
       {/* Message Input - Fixed at bottom with proper spacing from bottom nav */}
-      <div className="bg-white border-t border-gray-200 p-4 flex-shrink-0 mb-16">
+      <div
+        className={`bg-white border-t border-gray-200 p-4 flex-shrink-0 mb-16 ${
+          isIOS ? "pb-10" : ""
+        } ${isFocused && isIOS ? "mb-[230px]" : ""}`}
+      >
         <div className="flex gap-3 items-end">
           <div className="flex-1">
             <Input
               value={messageText}
               onChange={(e) => setMessageText(e.target.value)}
               onKeyPress={handleKeyPress}
+              onFocus={() => setIsFocused(true)}
+              onBlur={() => setIsFocused(false)}
               placeholder="Xabar yozing..."
               className="resize-none rounded-2xl border-gray-200 focus:border-blue-500 focus:ring-1 focus:ring-blue-500"
               disabled={isSending}
               maxLength={1000}
+              autoComplete="off"
+              autoCorrect="off"
+              autoCapitalize="sentences"
+              style={{
+                WebkitAppearance: "none",
+                fontSize: "16px", // Prevents zoom on iOS
+              }}
             />
           </div>
-          <Button
-            onClick={handleSendMessage}
+          <button
+            onClick={handleButtonPress}
+            onTouchStart={handleTouchStart}
+            onTouchEnd={handleTouchEnd}
             disabled={!messageText.trim() || isSending}
-            className="rounded-2xl bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 px-6 py-2.5"
+            className="rounded-2xl bg-blue-500 hover:bg-blue-600 disabled:bg-gray-300 disabled:cursor-not-allowed px-6 py-2.5 text-white font-medium transition-colors touch-manipulation"
+            style={{
+              WebkitTapHighlightColor: "transparent",
+              userSelect: "none",
+              WebkitUserSelect: "none",
+            }}
           >
             {isSending ? (
               <svg
@@ -440,7 +505,7 @@ const MessagesPage = () => {
                 />
               </svg>
             )}
-          </Button>
+          </button>
         </div>
         {/* <div className="mt-2 text-xs text-gray-500 text-right">
           {messageText.length}/1000

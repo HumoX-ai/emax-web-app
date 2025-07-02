@@ -73,6 +73,7 @@ const OrderDetailsPage = () => {
             </CardHeader>
             <CardContent>
               <div className="space-y-3">
+                <div className="h-40 bg-gray-200 rounded-lg w-full max-w-sm"></div>
                 {[1, 2, 3, 4, 5].map((i) => (
                   <div key={i} className="h-4 bg-gray-200 rounded w-full"></div>
                 ))}
@@ -193,6 +194,29 @@ const OrderDetailsPage = () => {
               <h3 className="font-semibold text-gray-800 mb-2">
                 Mahsulot ma'lumotlari
               </h3>
+              {order.photo && (
+                <div className="mb-3">
+                  <img
+                    src={`https://file.emaxb.uz/api/files?key=${order.photo}`}
+                    alt={order.name}
+                    className="w-full max-w-sm rounded-lg shadow-md border border-gray-200 cursor-pointer hover:shadow-lg transition-shadow"
+                    style={{ maxHeight: "300px", objectFit: "cover" }}
+                    onClick={() => {
+                      impactFeedback("light");
+                      window.open(
+                        `https://file.emaxb.uz/api/files?key=${order.photo}`,
+                        "_blank"
+                      );
+                    }}
+                    onError={(e) => {
+                      (e.target as HTMLImageElement).style.display = "none";
+                    }}
+                  />
+                  <p className="text-xs text-gray-500 mt-1 text-center">
+                    Bosib kattaroq ko'rish
+                  </p>
+                </div>
+              )}
               <p className="text-gray-600 mb-2">{order.description}</p>
               <p className="text-sm text-gray-600">
                 <span className="font-medium">Og'irligi:</span> {order.weight}kg

@@ -14,6 +14,7 @@ export interface Order {
   price: number;
   paidAmount: number;
   contractFile: string;
+  photo?: string; // Buyurtma rasmi
   status:
     | "PENDING"
     | "IN_WAREHOUSE"
