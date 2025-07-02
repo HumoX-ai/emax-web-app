@@ -441,7 +441,7 @@ const MessagesPage = () => {
       <div
         className={`bg-white border-t border-gray-200 p-4 flex-shrink-0 mb-16 ${
           isIOS ? "pb-10" : ""
-        } ${isFocused && isIOS ? "mb-[230px]" : ""}`}
+        } ${isFocused && isIOS ? "mb-[60px]" : ""}`}
       >
         <div className="flex gap-3 items-end">
           <div className="flex-1">
