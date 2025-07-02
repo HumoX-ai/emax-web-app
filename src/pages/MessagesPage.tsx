@@ -144,7 +144,7 @@ const MessagesPage = () => {
   }, [uniqueMessages]);
 
   const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+    messagesEndRef.current?.scrollIntoView({ behavior: "instant" });
   };
 
   const handleSendMessage = async () => {
@@ -365,7 +365,7 @@ const MessagesPage = () => {
                   >
                     {!isUserMessage && (
                       <p className="text-xs font-medium text-gray-600 mb-1">
-                        {message.seller.fullName}
+                        {message.seller?.fullName}
                       </p>
                     )}
                     <p className="text-sm leading-relaxed">{message.text}</p>

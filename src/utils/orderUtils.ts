@@ -93,11 +93,41 @@ export const formatPrice = (price: number) => {
 };
 
 // Sanani formatlash (faqat sana, vaqt yo'q)
+
+// formatDate: Bugun bo'lsa soat, kecha bo'lsa "kecha", undan oldin bo'lsa sana
 export const formatDate = (dateString: string) => {
   const date = new Date(dateString);
-  return date.toLocaleDateString("uz-UZ", {
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit",
-  });
+  const now = new Date();
+
+  // Bugunmi?
+  const isToday =
+    date.getDate() === now.getDate() &&
+    date.getMonth() === now.getMonth() &&
+    date.getFullYear() === now.getFullYear();
+
+  // Kechami?
+  const yesterday = new Date(now);
+  yesterday.setDate(now.getDate() - 1);
+  const isYesterday =
+    date.getDate() === yesterday.getDate() &&
+    date.getMonth() === yesterday.getMonth() &&
+    date.getFullYear() === yesterday.getFullYear();
+
+  if (isToday) {
+    // Faqat soat: 14:23
+    return date.toLocaleTimeString("uz-UZ", {
+      hour: "2-digit",
+      minute: "2-digit",
+      hour12: false,
+    });
+  } else if (isYesterday) {
+    return "kecha";
+  } else {
+    // Sana: 01.07.2025
+    return date.toLocaleDateString("uz-UZ", {
+      year: "numeric",
+      month: "2-digit",
+      day: "2-digit",
+    });
+  }
 };

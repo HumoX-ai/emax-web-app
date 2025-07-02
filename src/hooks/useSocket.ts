@@ -9,6 +9,8 @@ export const useSocket = (enabled: boolean = true) => {
 
     // Initialize socket connection
     const token = localStorage.getItem("token");
+    console.log(token);
+
     if (!token) {
       console.warn("[Socket] No token found in localStorage");
       return;
@@ -19,6 +21,7 @@ export const useSocket = (enabled: boolean = true) => {
       auth: {
         token,
       },
+      transports: ["websocket"],
     });
 
     socketRef.current = socket;
