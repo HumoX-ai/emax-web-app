@@ -494,7 +494,7 @@ const OrderDetailsPage = () => {
                   </svg>
                   <div className="text-left">
                     <p className="font-medium text-cyan-800">
-                      Qo'shimcha ma'lumotlar fayli
+                      Qo'shimcha ma'lumotlar
                     </p>
                     <p className="text-sm text-cyan-600">Faylni yuklab olish</p>
                   </div>
