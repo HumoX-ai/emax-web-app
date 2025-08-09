@@ -11,6 +11,7 @@ export interface Order {
   name: string;
   description: string;
   weight: number;
+  infoFile: string;
   price: number;
   paidAmount: number;
   contractFile: string;
