@@ -500,16 +500,16 @@ const OrderDetailsPage = () => {
                   </div>
                 </div>
                 <svg
-                  className="w-5 h-5 text-cyan-600"
+                  className="w-5 h-5 text-cyan-600 flex-shrink-0"
                   fill="none"
                   stroke="currentColor"
                   viewBox="0 0 24 24"
                 >
                   <path
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    strokeWidth={2}
-                    d="M13 16h-1v-4h-1m4 0h-1v4h-1m-4 0h1v-4h1"
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M13 16h-1v-4h-1m4 0h-1v4h-1m-4 0h1v-4h1"
                   />
                 </svg>
               </button>
