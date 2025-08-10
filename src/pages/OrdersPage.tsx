@@ -333,6 +333,32 @@ const OrdersPage = () => {
                     <span className="font-medium">Og'irligi:</span>{" "}
                     {order.weight}kg
                   </p>
+                  {order.volume != null && order.volume > 0 && (
+                    <p className="text-sm text-gray-600">
+                      <span className="font-medium">Hajmi:</span> {order.volume}{" "}
+                      m³
+                    </p>
+                  )}
+                  {order.quantity != null && order.quantity > 0 && (
+                    <p className="text-sm text-gray-600">
+                      <span className="font-medium">Soni:</span>{" "}
+                      {order.quantity} dona
+                    </p>
+                  )}
+                  {(order.warehouse?.name || order.warehouseId) && (
+                    <p className="text-sm text-gray-600">
+                      <span className="font-medium">Ombor:</span>{" "}
+                      {order.warehouse?.name ?? order.warehouseId}
+                    </p>
+                  )}
+                  {order.warehouseArrivalDate && (
+                    <p className="text-sm text-gray-600">
+                      <span className="font-medium">
+                        Omborga kelish sanasi:
+                      </span>{" "}
+                      {formatDate(order.warehouseArrivalDate)}
+                    </p>
+                  )}
                   <p className="text-sm text-gray-600">
                     <span className="font-medium">Narxi:</span>{" "}
                     {formatPrice(order.price)}

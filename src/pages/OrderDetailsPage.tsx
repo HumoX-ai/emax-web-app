@@ -221,6 +221,40 @@ const OrderDetailsPage = () => {
               <p className="text-sm text-gray-600">
                 <span className="font-medium">Og'irligi:</span> {order.weight}kg
               </p>
+              {order.volume != null && order.volume > 0 && (
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium">Hajmi:</span> {order.volume} m³
+                </p>
+              )}
+              {order.quantity != null && order.quantity > 0 && (
+                <p className="text-sm text-gray-600">
+                  <span className="font-medium">Soni:</span> {order.quantity}{" "}
+                  dona
+                </p>
+              )}
+              {(order.warehouse?.name ||
+                order.warehouseId ||
+                order.warehouseArrivalDate) && (
+                <div className="mt-3 p-3 bg-gray-50 border rounded-lg">
+                  <h4 className="text-sm font-semibold text-gray-800 mb-2">
+                    Ombor ma'lumotlari
+                  </h4>
+                  {(order.warehouse?.name || order.warehouseId) && (
+                    <p className="text-sm text-gray-600">
+                      <span className="font-medium">Ombor:</span>{" "}
+                      {order.warehouse?.name ?? order.warehouseId}
+                    </p>
+                  )}
+                  {order.warehouseArrivalDate && (
+                    <p className="text-sm text-gray-600">
+                      <span className="font-medium">
+                        Omborga kelish sanasi:
+                      </span>{" "}
+                      {formatDate(order.warehouseArrivalDate)}
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
 
             <div className="border-t pt-4">
@@ -506,10 +540,10 @@ const OrderDetailsPage = () => {
                   viewBox="0 0 24 24"
                 >
                   <path
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  strokeWidth={2}
-                  d="M13 16h-1v-4h-1m4 0h-1v4h-1m-4 0h1v-4h1"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={2}
+                    d="M13 16h-1v-4h-1m4 0h-1v4h-1m-4 0h1v-4h1"
                   />
                 </svg>
               </button>

@@ -11,6 +11,15 @@ export interface Order {
   name: string;
   description: string;
   weight: number;
+  // Optional new fields
+  volume?: number; // m³
+  quantity?: number; // dona/pcs
+  warehouseId?: string; // Ombor identifikatori
+  warehouseArrivalDate?: string; // ISO date string
+  warehouse?: {
+    _id?: string;
+    name: string;
+  };
   infoFile: string;
   price: number;
   paidAmount: number;
