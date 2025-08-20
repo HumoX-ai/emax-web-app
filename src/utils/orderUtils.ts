@@ -89,7 +89,7 @@ export const getPaymentStatusInfo = (status: string) => {
 
 // Narxni formatlash (sum)
 export const formatPrice = (price: number) => {
-  return new Intl.NumberFormat("uz-UZ").format(price) + " so'm";
+  return new Intl.NumberFormat("uz-UZ").format(price) + " USD";
 };
 
 // Sanani formatlash (faqat sana, vaqt yo'q)
